@@ -4,9 +4,9 @@ library(tidyverse)
 library(furrr)
 
 chr_dat<-read_tsv("./data/k562_chr1_5kb_KR_.txt",col_names = F)
-
+#
 load("./data/K562_CAGE_tbl.Rda")
-
+#
 cage_k562_on<-cage_k562 %>% 
   filter(m>0)
 
