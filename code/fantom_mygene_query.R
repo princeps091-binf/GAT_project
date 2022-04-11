@@ -24,11 +24,11 @@ entrez_set_l<-vector('list',nrow(gene_windows))
 for(i in 1:nrow(gene_windows)){
   message(round(i/length(entrez_set_l),digits=4))
   plan(multisession,workers=15)
-  entrez_set_l[[i]]<-future_map_chr(FANTOM5_peak_transcript_tbl$alt.name[gene_windows[i,1]:gene_windows[i,2]],function(x){
+  entrez_set_l[[i]]<-future_map(FANTOM5_peak_transcript_tbl$alt.name[gene_windows[i,1]:gene_windows[i,2]],function(x){
     tmp<-content(GET(paste0("https://mygene.info/v3/query?q=",x)))$hits
     if(length(tmp)>0){
       return(tmp[[1]]$entrezgene)
-    } else{return(NA)}
+    } else{return(NA_character_)}
   })
   plan(sequential)
 
