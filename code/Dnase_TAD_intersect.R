@@ -6,25 +6,27 @@ k562_TAD<-import.bed("./data/k562_TAD_with_ID_Family_TFBS_chr1_count.txt")
 
 chr1_TAD<-k562_TAD[seqnames(k562_TAD)=="chr1"]
 
-hist(log10(mcols(chr1_TAD)$score))
-
+chr1_TAD %>% as.data.frame %>% 
+  mutate(width=abs(end-start)) %>% 
+  ggplot(.,aes(width,score))+geom_density_2d_filled(show.legend = F)+scale_x_log10()+scale_y_log10()
 Dnase_Grange<-import.bed("./../data/Epi/K562/ENCSR000EKS_rep1_1_rep1_2_rep1_3_se_bwa_biorep_filtered_hotspots_DNase.bed")
 chr1_Dnase<-Dnase_Grange[seqnames(Dnase_Grange)=="chr1"]
 tmp_opt<-furrr_options(packages = c("GenomicRanges", "IRanges"))
 
-plan(multisession, workers=5)
 
-test<-tibble(as.data.frame(findOverlaps(chr1_TAD,Dnase_Grange))) %>% 
+test<-tibble(as.data.frame(findOverlaps(chr1_TAD,chr1_Dnase))) %>% 
   dplyr::rename(query=queryHits,subject=subjectHits) %>% 
-#  slice(1:5) %>% 
-    mutate(inter.Grange=future_pmap(list(query,subject),.options = tmp_opt,function(query,subject){
-    
-    return(IRanges::intersect(chr1_TAD[query],chr1_Dnase[subject]))
-    
-  })) %>% 
   mutate(TAD.id=mcols(chr1_TAD)$name[query])
-plan(sequential)
+inter_Grange<-pintersect(chr1_TAD[test$query],chr1_Dnase[test$subject])
+export.bed(inter_Grange,con = "./data/chr1_TAD_DNase_open.bed")
 
-inter_Grange<-do.call("c",test$inter.Grange)
+k562_TAD_dnase_count_tbl<-read_tsv("./data/k562_TAD_with_ID_Family_TFBS_chr1_dnase_count.txt",col_names = F)
 
-mcols(inter_Grange)<-tibble(ID=test$TAD.id)
+k562_TAD_dnase_count_tbl %>% 
+  group_by(X4) %>% 
+  summarise(full.count=unique(X5),dnase.count=sum(X7)) %>% 
+  ggplot(.,aes(full.count))+
+  geom_density(color="red")+
+  geom_density(aes(dnase.count),color="blue")+
+  scale_x_log10()
+ggsave("./img/Dnase_filter_TFBS_count.png")
