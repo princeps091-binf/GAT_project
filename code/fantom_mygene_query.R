@@ -42,5 +42,6 @@ for(i in 1:nrow(gene_windows)){
 
 unique_alt_tbl<-unique_alt_tbl %>% 
   mutate(entrez.id=unlist(entrez_set_l))
-
+FANTOM5_peak_transcript_tbl<-FANTOM5_peak_transcript_tbl %>% 
+  left_join(.,unique_alt_tbl)
 save(FANTOM5_peak_transcript_tbl,file=out_file)
