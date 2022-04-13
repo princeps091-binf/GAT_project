@@ -13,6 +13,7 @@ get_obj_in_fn<-function(file){
 #----------------------------
 #fantom_file<-"~/data_transfer/FANTOM_annotation_tbl.Rda"
 fantom_file<-"./data/FANTOM_annotation_tbl.Rda"
+fantom_file<-"./data/fantom_ann_entrez_tbl.Rda"
 
 out_file<-"~/data_transfer/fantom_ann_entrez_tbl.Rda"
 
