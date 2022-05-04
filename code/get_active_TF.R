@@ -47,5 +47,11 @@ K562_TF_tbl<-K562_CAGE_tbl %>%
   left_join(.,TF_tbl %>% mutate(entrezgene=as.character(entrezgene)),by=c("entrez.id1"="entrezgene"))
 unique(K562_TF_tbl$Symbol)
 
+K562_active_TF_tbl<-K562_TF_tbl %>% 
+  distinct(entrez.id1,Symbol) %>% 
+  dplyr::rename(entrez.id=entrez.id1)
+
+write_tsv(K562_active_TF_tbl,col_names = T,file = "./data/K562_active_TF.tsv")
+
 K562_TF_tbl %>% 
   ggplot(.,aes(m))+geom_density()+scale_x_log10()
