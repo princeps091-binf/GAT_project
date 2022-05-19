@@ -52,3 +52,10 @@ tibble(chr="chr1",bin=chr1_bin,cage.count=countOverlaps(bin_Grange,cage_all_Gran
   ggplot(.,aes(x="bin",n,fill=cage))+geom_bar(stat="identity")
 #0.1742072
 ggsave("./img/CAGE_all_bin_count_chr1.png")
+
+tibble(chr="chr1",bin=chr1_bin,cage.count=countOverlaps(bin_Grange,cage_all_Grange)) %>% 
+  mutate(cage=ifelse(cage.count>0,"cage","no cage")) %>% 
+  filter(cage=="cage") %>% 
+  ggplot(.,aes(cage.count))+
+  geom_density()+scale_x_log10()+xlab("CAGE-peak count")
+ggsave("./img/CAGE_all_bin_peak_count_chr1.png")
